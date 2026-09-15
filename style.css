@@ -1,0 +1,836 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+
+    background: #f6f6f6;
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
+    color: #222;
+}
+
+button,
+input {
+    font: inherit;
+}
+
+#mainPage {
+    max-width: 600px;
+
+    min-height: 100vh;
+
+    margin: 0 auto;
+
+    padding-bottom: 90px;
+
+    background: #fff;
+}
+
+.app-header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 14px 16px;
+
+    background: white;
+
+    border-bottom: 1px solid #eee;
+}
+
+.app-header h1 {
+    margin: 0;
+
+    font-size: 20px;
+}
+
+#logoutButton {
+    padding: 7px 10px;
+
+    border: none;
+    border-radius: 8px;
+
+    background: #eee;
+
+    font-size: 12px;
+
+    cursor: pointer;
+}
+
+.app-page {
+    display: none;
+
+    padding: 16px;
+}
+
+.app-page.active {
+    display: block;
+}
+
+section {
+    margin-bottom: 28px;
+}
+
+section h2 {
+    margin-top: 0;
+
+    font-size: 18px;
+}
+
+#bottomNavigation {
+    position: fixed;
+
+    bottom: 0;
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    width: 100%;
+    max-width: 600px;
+
+    display: flex;
+
+    background: white;
+
+    border-top: 1px solid #ddd;
+
+    padding-bottom:
+        env(safe-area-inset-bottom);
+}
+
+.nav-button {
+    flex: 1;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    gap: 3px;
+
+    padding: 10px 0;
+
+    border: none;
+
+    background: white;
+
+    color: #888;
+
+    font-size: 12px;
+
+    cursor: pointer;
+}
+
+.nav-button span:first-child {
+    font-size: 20px;
+}
+
+.nav-button.active {
+    color: #111;
+
+    font-weight: bold;
+}
+
+#itemNameInput {
+    width: 100%;
+
+    margin-top: 8px;
+    margin-bottom: 18px;
+
+    padding: 12px;
+
+    border: 1px solid #ccc;
+    border-radius: 10px;
+
+    font-size: 16px;
+}
+
+#saveItemButton {
+    width: 100%;
+
+    margin-top: 10px;
+
+    padding: 13px;
+
+    border: none;
+    border-radius: 10px;
+
+    background: #222;
+    color: white;
+
+    cursor: pointer;
+}
+
+#storeList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+
+    margin-bottom: 12px;
+}
+
+.store-tag {
+    padding: 8px 14px;
+
+    border: 1px solid #ccc;
+    border-radius: 20px;
+
+    background: white;
+
+    cursor: pointer;
+
+    font-size: 14px;
+}
+
+.store-tag:hover {
+    background: #f5f5f5;
+}
+
+.store-tag.selected {
+    background-color: #222;
+    color: white;
+    border-color: #222;
+}
+
+#addStoreButton {
+    padding: 8px 14px;
+
+    border: none;
+    border-radius: 8px;
+
+    cursor: pointer;
+}
+
+#itemStoreList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+
+    margin-bottom: 16px;
+}
+
+.item-store-tag {
+    padding: 8px 14px;
+
+    border: 1px solid #ccc;
+    border-radius: 20px;
+
+    background: white;
+    color: black;
+
+    cursor: pointer;
+}
+
+.item-store-tag.selected {
+    background: #222;
+    color: white;
+
+    border-color: #222;
+}
+
+.item-store-tag.selected::before {
+    content: "✓ ";
+}
+
+#quantityControl {
+    display: flex;
+    align-items: center;
+
+    gap: 16px;
+
+    margin: 8px 0 16px;
+}
+
+#quantityControl button {
+    width: 36px;
+    height: 36px;
+
+    font-size: 20px;
+}
+
+#quantityValue {
+    min-width: 24px;
+
+    text-align: center;
+
+    font-size: 18px;
+}
+
+#saveItemButton {
+    padding: 10px 20px;
+
+    cursor: pointer;
+}
+
+#shoppingList {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.shopping-item {
+    padding: 16px;
+
+    border: 1px solid #ddd;
+    border-radius: 12px;
+
+    background: white;
+}
+
+.shopping-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    font-size: 17px;
+}
+
+.shopping-item-stores {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+
+    margin-top: 10px;
+}
+
+.shopping-item-stores span {
+    padding: 4px 8px;
+
+    border-radius: 12px;
+
+    background: #f1f1f1;
+
+    font-size: 12px;
+}
+
+.shopping-item-meta {
+    margin-top: 10px;
+
+    color: #777;
+
+    font-size: 12px;
+}
+
+.shopping-item-info-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 12px;
+
+    margin-top: 10px;
+    margin-bottom: 14px;
+}
+
+.shopping-item-stores {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+
+    min-width: 0;
+}
+
+.shopping-item-meta {
+    flex-shrink: 0;
+
+    font-size: 12px;
+    color: #777;
+
+    white-space: nowrap;
+}
+
+.complete-purchase-button {
+    display: block;
+
+    width: 100%;
+    box-sizing: border-box;
+
+    padding: 12px 16px;
+
+    border: none;
+    border-radius: 10px;
+
+    background: #22a06b;
+    color: white;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    text-align: center;
+    white-space: nowrap;
+
+    cursor: pointer;
+
+    transition:
+        background 0.15s ease,
+        transform 0.1s ease;
+}
+
+.complete-purchase-button:hover {
+    background: #1b8759;
+}
+
+.complete-purchase-button:active {
+    transform: scale(0.98);
+}
+
+.complete-purchase-button:disabled {
+    background: #bbb;
+    cursor: default;
+    transform: none;
+}
+
+#historyViewButtons {
+    display: flex;
+    gap: 8px;
+
+    margin-bottom: 16px;
+}
+
+.history-view-button {
+    flex: 1;
+
+    padding: 10px;
+
+    border: 1px solid #ccc;
+    border-radius: 8px;
+
+    background: white;
+
+    cursor: pointer;
+}
+
+.history-view-button.selected {
+    background: #222;
+    color: white;
+    border-color: #222;
+}
+
+
+#purchaseHistory {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+
+.history-item,
+.history-event {
+    padding: 16px;
+
+    border: 1px solid #ddd;
+    border-radius: 12px;
+
+    background: white;
+}
+
+
+.history-item-header {
+    display: flex;
+    justify-content: space-between;
+
+    font-size: 17px;
+}
+
+
+.history-item-store {
+    margin-top: 8px;
+}
+
+
+.history-item-meta {
+    margin-top: 8px;
+
+    color: #777;
+
+    font-size: 12px;
+}
+
+
+.history-event-header {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    margin-bottom: 14px;
+}
+
+.history-event-header span {
+    color: #777;
+    font-size: 12px;
+}
+
+
+.history-event-item {
+    display: flex;
+    justify-content: space-between;
+
+    padding: 6px 0;
+}
+
+
+.history-event-total {
+    display: flex;
+    justify-content: space-between;
+
+    margin-top: 12px;
+    padding-top: 12px;
+
+    border-top: 1px solid #ddd;
+}
+
+#receiptSection {
+    padding: 16px;
+
+    border: 1px solid #eee;
+    border-radius: 14px;
+
+    background: #fafafa;
+}
+
+.section-description {
+    color: #777;
+
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+#selectReceiptButton {
+    width: 100%;
+
+    padding: 14px;
+
+    border: 1px dashed #aaa;
+    border-radius: 12px;
+
+    background: white;
+
+    cursor: pointer;
+}
+
+#receiptPreview {
+    margin-top: 16px;
+}
+
+#receiptPreviewImage {
+    display: block;
+
+    width: 100%;
+    max-height: 450px;
+
+    object-fit: contain;
+
+    border-radius: 10px;
+}
+
+#uploadReceiptButton,
+#cancelReceiptButton {
+    width: 100%;
+
+    margin-top: 10px;
+    padding: 12px;
+
+    border-radius: 10px;
+
+    cursor: pointer;
+}
+
+#uploadReceiptButton {
+    border: none;
+
+    background: #222;
+    color: white;
+}
+
+#cancelReceiptButton {
+    border: 1px solid #ccc;
+
+    background: white;
+}
+
+#uploadReceiptButton:disabled {
+    opacity: 0.5;
+}
+
+#receiptResult {
+    margin-top: 20px;
+    padding: 16px;
+
+    border: 1px solid #ddd;
+    border-radius: 14px;
+
+    background: white;
+}
+
+#receiptResult h3 {
+    margin-top: 0;
+}
+
+
+.receipt-result-info {
+    display: flex;
+    flex-direction: column;
+
+    gap: 10px;
+
+    margin-bottom: 18px;
+}
+
+.receipt-result-info div {
+    display: flex;
+    justify-content: space-between;
+
+    gap: 12px;
+}
+
+.receipt-result-info span {
+    color: #777;
+}
+
+
+#receiptResultItems {
+    border-top: 1px solid #eee;
+}
+
+
+.receipt-result-item {
+    display: flex;
+    justify-content: space-between;
+
+    gap: 16px;
+
+    padding: 14px 0;
+
+    border-bottom: 1px solid #eee;
+}
+
+
+.receipt-result-item-info {
+    display: flex;
+    flex-direction: column;
+
+    gap: 5px;
+}
+
+.receipt-result-item-info span {
+    color: #777;
+
+    font-size: 13px;
+}
+
+
+.receipt-result-item-price {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+
+    gap: 3px;
+
+    white-space: nowrap;
+}
+
+
+.receipt-original-price {
+    color: #999;
+
+    font-size: 12px;
+
+    text-decoration: line-through;
+}
+
+
+.receipt-discount {
+    font-size: 12px;
+}
+
+
+.receipt-result-total {
+    display: flex;
+    justify-content: space-between;
+
+    padding-top: 16px;
+
+    font-size: 17px;
+}
+
+
+.receipt-result-actions {
+    display: flex;
+
+    gap: 10px;
+
+    margin-top: 20px;
+}
+
+
+.receipt-result-actions button {
+    flex: 1;
+
+    padding: 12px;
+
+    border-radius: 10px;
+
+    cursor: pointer;
+}
+
+
+#cancelReceiptResultButton {
+    border: 1px solid #ccc;
+
+    background: white;
+}
+
+
+#confirmReceiptButton {
+    border: none;
+
+    background: #222;
+    color: white;
+}
+
+.receipt-result-item-content {
+    width: 100%;
+}
+
+.receipt-result-item-top {
+    display: flex;
+    justify-content: space-between;
+
+    gap: 16px;
+}
+
+.receipt-match-area {
+    display: flex;
+    flex-direction: column;
+
+    gap: 8px;
+
+    margin-top: 14px;
+    padding-top: 12px;
+
+    border-top: 1px dashed #ddd;
+}
+
+.receipt-match-label {
+    color: #777;
+
+    font-size: 12px;
+}
+
+.receipt-match-select {
+    width: 100%;
+
+    padding: 10px;
+
+    border: 1px solid #ccc;
+    border-radius: 8px;
+
+    background: white;
+
+    font-size: 14px;
+}
+
+.receipt-auto-match {
+    font-size: 12px;
+    color: #666;
+}
+
+.receipt-match-suggestions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 7px;
+    margin-top: 3px;
+}
+
+.receipt-match-suggestions > span {
+    width: 100%;
+    font-size: 12px;
+    color: #777;
+}
+
+.receipt-match-suggestions button {
+    padding: 6px 10px;
+    border: 1px solid #ddd;
+    border-radius: 999px;
+    background: white;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.receipt-item-name-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.receipt-item-name-row {
+    min-width: 0;
+}
+
+.receipt-item-name-row strong {
+    overflow-wrap: anywhere;
+    word-break: keep-all;
+}
+
+
+/*
+ * 품명 수정 버튼 영역
+ */
+.receipt-item-edit-area {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 8px;
+}
+
+
+/*
+ * 수정 / 적용 버튼 공통 스타일
+ */
+.receipt-item-name-edit,
+.receipt-item-name-apply {
+    flex: none;
+    width: auto;
+    min-width: 64px;
+
+    padding: 6px 10px;
+
+    border: 1px solid #ddd;
+    border-radius: 7px;
+
+    background: white;
+    color: #666;
+
+    font-size: 12px;
+    line-height: 1.2;
+
+    white-space: nowrap;
+
+    cursor: pointer;
+}
+
+
+/*
+ * 품명 입력창
+ */
+.receipt-item-name-input {
+    width: 100%;
+    box-sizing: border-box;
+
+    padding: 8px 10px;
+
+    border: 1px solid #aaa;
+    border-radius: 8px;
+
+    font-size: 14px;
+}

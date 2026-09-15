@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>구매 목록</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- 로그인 화면 -->
+    <main id="loginPage">
+
+        <h1>🛒 구매 목록</h1>
+
+        <p>로그인해주세요.</p>
+
+        <input
+            id="emailInput"
+            type="email"
+            placeholder="이메일"
+        >
+
+        <input
+            id="passwordInput"
+            type="password"
+            placeholder="비밀번호"
+        >
+
+        <button id="loginButton">
+            로그인
+        </button>
+
+        <p id="loginMessage"></p>
+
+    </main>
+
+
+    <!-- 로그인 후 화면 -->
+    <main id="mainPage" hidden>
+
+        <header class="app-header">
+            <h1 id="pageTitle">🛒 구매 목록</h1>
+    
+            <button id="logoutButton">
+                로그아웃
+            </button>
+        </header>
+    
+    
+        <!-- 구매 목록 화면 -->
+        <div
+            id="listPage"
+            class="app-page active"
+        >
+    
+            <section>
+                <h2>구매처</h2>
+    
+                <div id="storeList">
+                </div>
+    
+                <button id="addStoreButton">
+                    + 구매처 추가
+                </button>
+            </section>
+    
+            <section id="receiptSection">
+
+                <h2>영수증으로 구매 완료</h2>
+            
+                <p class="section-description">
+                    구매 후 영수증을 촬영하거나 사진을 선택해주세요.
+                </p>
+            
+                <input
+                    id="receiptInput"
+                    type="file"
+                    accept="image/*"
+                    capture="environment"
+                    hidden
+                >
+            
+                <button
+                    id="selectReceiptButton"
+                    type="button"
+                >
+                    📷 영수증 촬영 / 선택
+                </button>
+            
+                <div id="receiptPreview" hidden>
+            
+                    <img
+                        id="receiptPreviewImage"
+                        alt="영수증 미리보기"
+                    >
+            
+                    <button
+                        id="uploadReceiptButton"
+                        type="button"
+                    >
+                        이 영수증 사용하기
+                    </button>
+            
+                    <button
+                        id="cancelReceiptButton"
+                        type="button"
+                    >
+                        취소
+                    </button>
+            
+                </div>
+            
+                <p id="receiptMessage"></p>
+
+                <div id="receiptResult" hidden>
+
+                    <h3>영수증 분석 결과</h3>
+                
+                    <div class="receipt-result-info">
+                
+                        <div>
+                            <span>영수증 판매처</span>
+                            <strong id="receiptStoreName"></strong>
+                        </div>
+                        
+                        <div class="receipt-store-match">
+                            <span>구매처</span>
+                            <select id="receiptStoreSelect"></select>
+                        </div>
+                
+                        <div>
+                            <span>구매 일시</span>
+                            <strong id="receiptPurchasedAt"></strong>
+                        </div>
+                
+                    </div>
+                
+                
+                    <div id="receiptResultItems">
+                        <!-- 분석된 상품 -->
+                    </div>
+                
+                
+                    <div class="receipt-result-total">
+                
+                        <span>총 결제금액</span>
+                
+                        <strong id="receiptTotalAmount">
+                        </strong>
+                
+                    </div>
+                
+                
+                    <div class="receipt-result-actions">
+                
+                        <button
+                            id="cancelReceiptResultButton"
+                            type="button"
+                        >
+                            취소
+                        </button>
+                
+                        <button
+                            id="confirmReceiptButton"
+                            type="button"
+                        >
+                            구매 완료
+                        </button>
+                
+                    </div>
+                
+                </div>
+            
+            </section>
+    
+            <section id="shoppingListSection">
+    
+                <h2>구매할 물건</h2>
+    
+                <div id="shoppingList">
+                </div>
+    
+                <p
+                    id="emptyShoppingList"
+                    hidden
+                >
+                    구매할 물건이 없습니다.
+                </p>
+    
+            </section>
+    
+        </div>
+    
+    
+        <!-- 물품 추가 화면 -->
+        <div
+            id="addPage"
+            class="app-page"
+        >
+    
+            <section id="addItemSection">
+    
+                <h2>구매 물품 등록</h2>
+    
+    
+                <label for="itemNameInput">
+                    품명
+                </label>
+    
+                <input
+                    id="itemNameInput"
+                    type="text"
+                    placeholder="예: 물티슈"
+                >
+    
+    
+                <label>
+                    수량
+                </label>
+    
+                <div id="quantityControl">
+    
+                    <button
+                        id="decreaseQuantityButton"
+                        type="button"
+                    >
+                        −
+                    </button>
+    
+                    <span id="quantityValue">
+                        1
+                    </span>
+    
+                    <button
+                        id="increaseQuantityButton"
+                        type="button"
+                    >
+                        +
+                    </button>
+    
+                </div>
+    
+    
+                <p>구매처</p>
+    
+                <div id="itemStoreList">
+                </div>
+    
+    
+                <button id="saveItemButton">
+                    등록
+                </button>
+    
+                <p id="itemMessage"></p>
+    
+            </section>
+    
+        </div>
+    
+    
+        <!-- 구매 기록 화면 -->
+        <div
+            id="historyPage"
+            class="app-page"
+        >
+    
+            <section id="purchaseHistorySection">
+    
+                <h2>구매 기록</h2>
+    
+    
+                <div id="historyViewButtons">
+    
+                    <button
+                        id="itemHistoryButton"
+                        type="button"
+                        class="history-view-button selected"
+                    >
+                        품목별로 보기
+                    </button>
+    
+                    <button
+                        id="eventHistoryButton"
+                        type="button"
+                        class="history-view-button"
+                    >
+                        쇼핑 이벤트별 보기
+                    </button>
+    
+                </div>
+    
+    
+                <div id="purchaseHistory">
+                </div>
+    
+    
+                <p
+                    id="emptyPurchaseHistory"
+                    hidden
+                >
+                    아직 구매 기록이 없습니다.
+                </p>
+    
+            </section>
+    
+        </div>
+    
+    
+        <!-- 하단 메뉴 -->
+        <nav id="bottomNavigation">
+    
+            <button
+                class="nav-button active"
+                data-page="list"
+            >
+                <span>🛒</span>
+                <span>목록</span>
+            </button>
+    
+    
+            <button
+                class="nav-button"
+                data-page="add"
+            >
+                <span>＋</span>
+                <span>추가</span>
+            </button>
+    
+    
+            <button
+                class="nav-button"
+                data-page="history"
+            >
+                <span>🕘</span>
+                <span>기록</span>
+            </button>
+    
+        </nav>
+    
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script src="app.js"></script>
+
+</body>
+</html>
