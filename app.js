@@ -812,7 +812,6 @@ function renderItems() {
 
 
                 <div class="shopping-item-meta">
-                    등록자:
                     ${escapeHtml(
                         item.profiles?.display_name
                         ?? "알 수 없음"
