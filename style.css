@@ -360,7 +360,7 @@ section h2 {
     border: none;
     border-radius: 10px;
 
-    background: #22a06b;
+    background: #4F6FAE;
     color: white;
 
     font-size: 14px;
@@ -377,7 +377,7 @@ section h2 {
 }
 
 .complete-purchase-button:hover {
-    background: #1b8759;
+    background: #405E98;
 }
 
 .complete-purchase-button:active {
@@ -833,4 +833,190 @@ section h2 {
     border-radius: 8px;
 
     font-size: 14px;
+}
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+
+    background:
+        rgba(0, 0, 0, 0.45);
+
+    z-index: 1000;
+}
+
+.modal-overlay[hidden] {
+    display: none;
+}
+
+
+.item-detail-modal {
+    width: 100%;
+    max-width: 420px;
+
+    box-sizing: border-box;
+
+    padding: 22px;
+
+    border-radius: 16px;
+
+    background: white;
+
+    box-shadow:
+        0 12px 40px
+        rgba(0, 0, 0, 0.18);
+}
+
+
+.item-detail-modal h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+
+.item-detail-row {
+    display: flex;
+
+    justify-content: space-between;
+    align-items: flex-start;
+
+    gap: 20px;
+
+    padding: 12px 0;
+
+    border-bottom:
+        1px solid #eeeeee;
+}
+
+
+.item-detail-row > span {
+    flex-shrink: 0;
+
+    color: #777777;
+}
+
+
+.item-detail-stores {
+    display: flex;
+
+    justify-content: flex-end;
+    flex-wrap: wrap;
+
+    gap: 6px;
+}
+
+
+.item-detail-stores span {
+    padding: 4px 8px;
+
+    border-radius: 12px;
+
+    background: #f1f1f1;
+
+    font-size: 12px;
+}
+
+
+.item-detail-actions {
+    display: flex;
+
+    gap: 10px;
+
+    margin-top: 24px;
+}
+
+
+.item-detail-actions button {
+    flex: 1;
+
+    padding: 12px;
+
+    border-radius: 10px;
+
+    cursor: pointer;
+}
+
+
+#itemEditButton {
+    border: none;
+
+    background: #222222;
+    color: white;
+}
+
+
+#itemDeleteButton {
+    border: 1px solid #dddddd;
+
+    background: white;
+}
+
+
+.item-edit-label {
+    display: block;
+
+    margin-top: 16px;
+    margin-bottom: 7px;
+
+    font-size: 14px;
+
+    color: #666666;
+}
+
+
+.item-edit-input {
+    width: 100%;
+
+    box-sizing: border-box;
+
+    padding: 11px;
+
+    border:
+        1px solid #cccccc;
+
+    border-radius: 8px;
+
+    font-size: 15px;
+}
+
+
+.item-edit-quantity {
+    display: flex;
+
+    align-items: center;
+
+    gap: 16px;
+}
+
+
+.item-edit-quantity button {
+    width: 36px;
+    height: 36px;
+
+    font-size: 20px;
+
+    cursor: pointer;
+}
+
+
+#editQuantityValue {
+    min-width: 24px;
+
+    text-align: center;
+
+    font-size: 18px;
+}
+
+
+#editItemStoreList {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 8px;
 }

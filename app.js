@@ -26,6 +26,16 @@ let historyView = "item";
 
 let stores = [];
 
+let currentProfile = null;
+
+let selectedDetailItem = null;
+
+let itemDetailEditMode = false;
+
+let editItemQuantity = 1;
+
+let editItemStoreIds = [];
+
 
 // Elements
 
@@ -164,6 +174,31 @@ const receiptStoreSelect =
         "receiptStoreSelect"
     );
 
+const itemDetailModal =
+    document.getElementById(
+        "itemDetailModal"
+    );
+
+const itemDetailTitle =
+    document.getElementById(
+        "itemDetailTitle"
+    );
+
+const itemDetailContent =
+    document.getElementById(
+        "itemDetailContent"
+    );
+
+const itemEditButton =
+    document.getElementById(
+        "itemEditButton"
+    );
+
+const itemDeleteButton =
+    document.getElementById(
+        "itemDeleteButton"
+    );
+
 
 let currentReceiptAnalysis = null;
 let receiptMatches = [];
@@ -207,12 +242,64 @@ async function login() {
 }
 
 
+// Load Current Profile
+
+async function loadCurrentProfile(user) {
+
+    const { data, error } =
+        await db
+            .from("profiles")
+            .select(`
+                id,
+                display_name,
+                household_id
+            `)
+            .eq("id", user.id)
+            .single();
+
+
+    if (error) {
+
+        console.error(
+            "프로필 조회 실패:",
+            error
+        );
+
+        currentProfile = null;
+
+        return false;
+    }
+
+
+    currentProfile = data;
+
+    return true;
+}
+
+
 // Main Page
 
-async function showMainPage() {
+async function showMainPage(user) {
+
+    const profileLoaded =
+        await loadCurrentProfile(user);
+
+
+    if (!profileLoaded) {
+
+        loginMessage.textContent =
+            "사용자 정보를 불러오지 못했습니다.";
+
+        mainPage.hidden = true;
+        loginPage.hidden = false;
+
+        return;
+    }
+
 
     loginPage.hidden = true;
     mainPage.hidden = false;
+
 
     await loadStores();
     await loadItems();
@@ -241,6 +328,7 @@ async function logout() {
 
     mainPage.hidden = true;
     loginPage.hidden = false;
+    currentProfile = null;
 
     passwordInput.value = "";
 }
@@ -425,13 +513,31 @@ async function addStore() {
         return;
     }
 
+    if (
+        !currentProfile ||
+        !currentProfile.household_id
+    ) {
+
+        console.error(
+            "household 정보를 찾을 수 없습니다."
+        );
+
+        alert(
+            "사용자 정보를 확인하지 못했습니다."
+        );
+
+        return;
+    }
+
 
     const { error } =
         await db
             .from("stores")
             .insert({
                 name: trimmedName,
-                created_by: user.id
+                created_by: user.id,
+                household_id:
+                    currentProfile.household_id
             });
 
 
@@ -590,6 +696,21 @@ async function saveItem() {
         error: userError
     } = await db.auth.getUser();
 
+    if (
+        !currentProfile ||
+        !currentProfile.household_id
+    ) {
+
+        console.error(
+            "household 정보를 찾을 수 없습니다."
+        );
+
+        itemMessage.textContent =
+            "사용자 정보를 확인하지 못했습니다.";
+
+        return;
+    }
+
 
     if (userError || !user) {
 
@@ -611,7 +732,9 @@ async function saveItem() {
             .insert({
                 name: itemName,
                 quantity: itemQuantity,
-                created_by: user.id
+                created_by: user.id,
+                household_id:
+                    currentProfile.household_id
             })
             .select()
             .single();
@@ -838,13 +961,21 @@ function renderItems() {
 
         completeButton.addEventListener(
             "click",
-            () => {
-
+            event => {
+        
+                event.stopPropagation();
+        
                 startCompletePurchase(item);
-
+        
             }
         );
-
+        
+        card.addEventListener(
+            "click",
+            () => {
+                openItemDetail(item);
+            }
+        );
 
         shoppingList.appendChild(card);
     });
@@ -2756,6 +2887,650 @@ return Math.max(
 }
 
 
+// Open Item Detail
+
+function openItemDetail(item) {
+
+    selectedDetailItem = item;
+
+    itemDetailEditMode = false;
+
+    renderItemDetail();
+
+    itemDetailModal.hidden = false;
+}
+
+
+// Render Item Detail
+
+function renderItemDetail() {
+
+    if (!selectedDetailItem) {
+        return;
+    }
+
+
+    const item =
+        selectedDetailItem;
+
+
+    const storeNames =
+        item.item_stores
+            .map(itemStore =>
+                itemStore.stores?.name
+            )
+            .filter(Boolean);
+
+
+    itemDetailTitle.textContent =
+        "물품 상세";
+
+
+    itemDetailContent.innerHTML = "";
+
+
+    /*
+     * 품명
+     */
+
+    const nameRow =
+        createItemDetailRow(
+            "품명",
+            item.name
+        );
+
+
+    /*
+     * 수량
+     */
+
+    const quantityRow =
+        createItemDetailRow(
+            "수량",
+            `${item.quantity}개`
+        );
+
+
+    /*
+     * 구매처
+     */
+
+    const storeRow =
+        document.createElement("div");
+
+    storeRow.className =
+        "item-detail-row";
+
+
+    const storeLabel =
+        document.createElement("span");
+
+    storeLabel.textContent =
+        "구매처";
+
+
+    const storeValue =
+        document.createElement("div");
+
+    storeValue.className =
+        "item-detail-stores";
+
+
+    storeNames.forEach(name => {
+
+        const tag =
+            document.createElement("span");
+
+        tag.textContent =
+            name;
+
+        storeValue.appendChild(tag);
+    });
+
+
+    storeRow.appendChild(storeLabel);
+    storeRow.appendChild(storeValue);
+
+
+    /*
+     * 등록자
+     */
+
+    const creatorRow =
+        createItemDetailRow(
+            "등록자",
+            item.profiles?.display_name
+                ?? "알 수 없음"
+        );
+
+
+    itemDetailContent.appendChild(
+        nameRow
+    );
+
+    itemDetailContent.appendChild(
+        quantityRow
+    );
+
+    itemDetailContent.appendChild(
+        storeRow
+    );
+
+    itemDetailContent.appendChild(
+        creatorRow
+    );
+
+
+    itemEditButton.textContent =
+        "수정";
+
+    itemDeleteButton.textContent =
+        "삭제";
+}
+
+
+// Create Item Detail Row
+
+function createItemDetailRow(
+    label,
+    value
+) {
+
+    const row =
+        document.createElement("div");
+
+    row.className =
+        "item-detail-row";
+
+
+    const labelElement =
+        document.createElement("span");
+
+    labelElement.textContent =
+        label;
+
+
+    const valueElement =
+        document.createElement("strong");
+
+    valueElement.textContent =
+        value;
+
+
+    row.appendChild(
+        labelElement
+    );
+
+    row.appendChild(
+        valueElement
+    );
+
+
+    return row;
+}
+
+
+// Start Item Edit
+
+function startItemEdit() {
+
+    if (!selectedDetailItem) {
+        return;
+    }
+
+
+    itemDetailEditMode = true;
+
+    editItemQuantity =
+        selectedDetailItem.quantity;
+
+
+    editItemStoreIds =
+        selectedDetailItem.item_stores
+            .map(itemStore =>
+                itemStore.store_id
+            );
+
+
+    renderItemEditForm();
+}
+
+
+// Render Item Edit Form
+
+function renderItemEditForm() {
+
+    const item =
+        selectedDetailItem;
+
+
+    itemDetailTitle.textContent =
+        "물품 수정";
+
+    itemDetailContent.innerHTML = "";
+
+
+    /*
+     * 품명
+     */
+
+    const nameLabel =
+        document.createElement("label");
+
+    nameLabel.className =
+        "item-edit-label";
+
+    nameLabel.textContent =
+        "품명";
+
+
+    const nameInput =
+        document.createElement("input");
+
+    nameInput.id =
+        "editItemNameInput";
+
+    nameInput.className =
+        "item-edit-input";
+
+    nameInput.type =
+        "text";
+
+    nameInput.value =
+        item.name;
+
+
+    /*
+     * 수량
+     */
+
+    const quantityLabel =
+        document.createElement("label");
+
+    quantityLabel.className =
+        "item-edit-label";
+
+    quantityLabel.textContent =
+        "수량";
+
+
+    const quantityContainer =
+        document.createElement("div");
+
+    quantityContainer.className =
+        "item-edit-quantity";
+
+
+    const decreaseButton =
+        document.createElement("button");
+
+    decreaseButton.type =
+        "button";
+
+    decreaseButton.textContent =
+        "−";
+
+
+    const quantityValue =
+        document.createElement("span");
+
+    quantityValue.id =
+        "editQuantityValue";
+
+    quantityValue.textContent =
+        editItemQuantity;
+
+
+    const increaseButton =
+        document.createElement("button");
+
+    increaseButton.type =
+        "button";
+
+    increaseButton.textContent =
+        "+";
+
+
+    decreaseButton.addEventListener(
+        "click",
+        () => {
+
+            if (editItemQuantity > 1) {
+                editItemQuantity--;
+            }
+
+            quantityValue.textContent =
+                editItemQuantity;
+        }
+    );
+
+
+    increaseButton.addEventListener(
+        "click",
+        () => {
+
+            editItemQuantity++;
+
+            quantityValue.textContent =
+                editItemQuantity;
+        }
+    );
+
+
+    quantityContainer.appendChild(
+        decreaseButton
+    );
+
+    quantityContainer.appendChild(
+        quantityValue
+    );
+
+    quantityContainer.appendChild(
+        increaseButton
+    );
+
+
+    /*
+     * 구매처
+     */
+
+    const storeLabel =
+        document.createElement("label");
+
+    storeLabel.className =
+        "item-edit-label";
+
+    storeLabel.textContent =
+        "구매처";
+
+
+    const storeContainer =
+        document.createElement("div");
+
+    storeContainer.id =
+        "editItemStoreList";
+
+
+    itemDetailContent.appendChild(
+        nameLabel
+    );
+
+    itemDetailContent.appendChild(
+        nameInput
+    );
+
+    itemDetailContent.appendChild(
+        quantityLabel
+    );
+
+    itemDetailContent.appendChild(
+        quantityContainer
+    );
+
+    itemDetailContent.appendChild(
+        storeLabel
+    );
+
+    itemDetailContent.appendChild(
+        storeContainer
+    );
+
+
+    renderEditItemStores();
+
+
+    itemEditButton.textContent =
+        "수정 완료";
+
+    itemDeleteButton.textContent =
+        "취소";
+}
+
+
+// Render Edit Item Stores
+
+function renderEditItemStores() {
+
+    const container =
+        document.getElementById(
+            "editItemStoreList"
+        );
+
+
+    if (!container) {
+        return;
+    }
+
+
+    container.innerHTML = "";
+
+
+    stores.forEach(store => {
+
+        const button =
+            document.createElement(
+                "button"
+            );
+
+        button.type =
+            "button";
+
+        button.className =
+            "item-store-tag";
+
+        button.textContent =
+            store.name;
+
+
+        if (
+            editItemStoreIds.includes(
+                store.id
+            )
+        ) {
+            button.classList.add(
+                "selected"
+            );
+        }
+
+
+        button.addEventListener(
+            "click",
+            () => {
+
+                if (
+                    editItemStoreIds.includes(
+                        store.id
+                    )
+                ) {
+
+                    editItemStoreIds =
+                        editItemStoreIds.filter(
+                            id =>
+                                id !== store.id
+                        );
+
+                } else {
+
+                    editItemStoreIds.push(
+                        store.id
+                    );
+                }
+
+
+                renderEditItemStores();
+            }
+        );
+
+
+        container.appendChild(
+            button
+        );
+    });
+}
+
+
+// Update Selected Item
+
+async function updateSelectedItem() {
+
+    if (!selectedDetailItem) {
+        return;
+    }
+
+
+    const nameInput =
+        document.getElementById(
+            "editItemNameInput"
+        );
+
+
+    const itemName =
+        nameInput.value.trim();
+
+
+    if (!itemName) {
+
+        alert(
+            "품명을 입력해주세요."
+        );
+
+        return;
+    }
+
+
+    if (
+        editItemStoreIds.length === 0
+    ) {
+
+        alert(
+            "구매처를 하나 이상 선택해주세요."
+        );
+
+        return;
+    }
+
+
+    itemEditButton.disabled = true;
+
+
+    const { error } =
+        await db.rpc(
+            "update_item",
+            {
+                p_item_id:
+                    selectedDetailItem.id,
+
+                p_name:
+                    itemName,
+
+                p_quantity:
+                    editItemQuantity,
+
+                p_store_ids:
+                    editItemStoreIds
+            }
+        );
+
+
+    itemEditButton.disabled = false;
+
+
+    if (error) {
+
+        console.error(
+            "물품 수정 실패:",
+            error
+        );
+
+        alert(
+            "물품을 수정하지 못했습니다."
+        );
+
+        return;
+    }
+
+
+    closeItemDetail();
+
+    await loadItems();
+}
+
+
+// Delete Selected Item
+
+async function deleteSelectedItem() {
+
+    if (!selectedDetailItem) {
+        return;
+    }
+
+
+    const confirmed =
+        confirm(
+            `"${selectedDetailItem.name}"을(를) 삭제할까요?`
+        );
+
+
+    if (!confirmed) {
+        return;
+    }
+
+
+    itemDeleteButton.disabled = true;
+
+
+    const { error } =
+        await db.rpc(
+            "delete_item",
+            {
+                p_item_id:
+                    selectedDetailItem.id
+            }
+        );
+
+
+    itemDeleteButton.disabled = false;
+
+
+    if (error) {
+
+        console.error(
+            "물품 삭제 실패:",
+            error
+        );
+
+        alert(
+            "물품을 삭제하지 못했습니다."
+        );
+
+        return;
+    }
+
+
+    closeItemDetail();
+
+    await loadItems();
+}
+
+// Close Item Detail
+
+function closeItemDetail() {
+
+    itemDetailModal.hidden =
+        true;
+
+    selectedDetailItem =
+        null;
+
+    itemDetailEditMode =
+        false;
+
+    editItemQuantity =
+        1;
+
+    editItemStoreIds =
+        [];
+}
 // Escape HTML
 
 function escapeHtml(value) {
@@ -3149,6 +3924,55 @@ confirmReceiptButton.addEventListener(
 
             confirmReceiptButton.disabled =
                 false;
+        }
+    }
+);
+
+itemEditButton.addEventListener(
+    "click",
+    async () => {
+
+        if (itemDetailEditMode) {
+
+            await updateSelectedItem();
+
+        } else {
+
+            startItemEdit();
+        }
+    }
+);
+
+
+itemDeleteButton.addEventListener(
+    "click",
+    async () => {
+
+        if (itemDetailEditMode) {
+
+            itemDetailEditMode =
+                false;
+
+            renderItemDetail();
+
+        } else {
+
+            await deleteSelectedItem();
+        }
+    }
+);
+
+itemDetailModal.addEventListener(
+    "click",
+    event => {
+
+        if (
+            event.target ===
+                itemDetailModal &&
+            !itemDetailEditMode
+        ) {
+
+            closeItemDetail();
         }
     }
 );

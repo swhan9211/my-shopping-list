@@ -344,6 +344,39 @@
     
         </nav>
     
+
+        <!-- 구매 물품 상세 모달 -->
+        <div
+            id="itemDetailModal"
+            class="modal-overlay"
+            hidden
+        >
+            <div class="item-detail-modal">
+
+                <h2 id="itemDetailTitle">
+                    물품 상세
+                </h2>
+
+                <div id="itemDetailContent"></div>
+
+                <div class="item-detail-actions">
+                    <button
+                        id="itemEditButton"
+                        type="button"
+                    >
+                        수정
+                    </button>
+
+                    <button
+                        id="itemDeleteButton"
+                        type="button"
+                    >
+                        삭제
+                    </button>
+                </div>
+
+            </div>
+        </div>
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
